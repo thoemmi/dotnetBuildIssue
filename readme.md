@@ -1,3 +1,7 @@
+**Update:** Solution found, see the end of this document.
+
+## Issue description
+
 This repository reproduces a `dotnet build` issue we're facing.
 
 We have a web application targeting `netcoreapp2.1`. and a class library targeting both `netstandard2.0` and `net47`.
@@ -34,3 +38,18 @@ is less than optimal.
 We would have preferred not having to define the dependency in the solution file, but we haven't found a working way to do it in the *.csproj* file.
 
 Any hint how to enforce a specific order of the projects without a direct reference (we're targeting different frameworks) is welcome.
+
+## Update: Solution found
+
+Actually, some more research revealed that this issue is [known](https://github.com/Microsoft/msbuild/issues/3626) and will be fixed in **MSBuild 15.9**.
+A temporary fix is also mentioned in above thread: put a file *Directory.Build.props* next to your solution file with following content:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <!-- Solution build dependencies are not project dependencies. https://github.com/Microsoft/msbuild/issues/3626 -->
+    <AddSyntheticProjectReferencesForSolutionDependencies>false</AddSyntheticProjectReferencesForSolutionDependencies>
+  </PropertyGroup>
+</Project>
+```
